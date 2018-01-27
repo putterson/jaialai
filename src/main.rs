@@ -1,7 +1,7 @@
 //! The simplest possible example that does something.
 extern crate ggez;
 use ggez::*;
-use ggez::graphics::{DrawMode, Point2};
+use ggez::graphics::{DrawMode, Point2, Color};
 use ggez::event::{Mod, Keycode};
 
 struct MainState {
@@ -19,17 +19,36 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
 
-        self.pos_x = self.pos_x % 800.0 + 1.0;
+        self.pos_x = self.pos_x % 800.0 + 2.0;
+        self.pos_y = self.pos_y % 600.0 + 1.0;
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
+
+        graphics::set_color(ctx, graphics::Color::new(0.1, 0.4, 0.2, 1.0))?;
+
+        graphics::polygon(ctx, DrawMode::Fill, & vec![
+            Point2::new(250.0,590.0),
+            Point2::new(50.0,490.0),
+            Point2::new(750.0,340.0),
+        ])?;
+
+        graphics::polygon(ctx, DrawMode::Fill, & vec![
+            Point2::new(550.0,240.0),
+            Point2::new(50.0,490.0),
+            Point2::new(750.0,340.0),
+        ])?;
+
+        graphics::set_color(ctx, Color::new(1.0,1.0,1.0,0.8));
+
         graphics::circle(ctx,
                          DrawMode::Fill,
                          Point2::new(self.pos_x, self.pos_y),
-                         100.0,
-                         2.0)?;
+                         3.0,
+                         0.1)?;
+
         graphics::present(ctx);
         Ok(())
     }
