@@ -1,12 +1,79 @@
 //! The simplest possible example that does something.
 extern crate ggez;
+extern crate nalgebra as na;
+extern crate ncollide;
+extern crate nphysics3d;
+
 use ggez::*;
 use ggez::graphics::{DrawMode, Point2, Color};
 use ggez::event::{Mod, Keycode};
 
+use na::{Point3, Vector3, Translation3, Scalar, Real};
+use ncollide::shape::{Ball, Plane};
+use nphysics3d::world::World;
+use nphysics3d::object::RigidBody;
+
+
 struct MainState {
     pos_x: f32,
     pos_y:f32
+}
+
+
+struct Physics<N> where N: Real {
+    world: World<N>,
+}
+
+impl<N: Real> Physics<N> {
+    pub fn init() -> World<N> {
+        /*
+        * World
+        */
+        let mut world = World::new();
+        world.set_gravity(Vector3::new(0.0, -9.81, 0.0));
+
+        /*
+        * Planes
+        */
+        let normals = [
+            Vector3::new(-1.0, 1.0, -1.0 ),
+            Vector3::new(1.0, 1.0, -1.0 ),
+            Vector3::new(-1.0, 1.0, 1.0 ),
+            Vector3::new(1.0, 1.0, 1.0 )
+        ];
+        for n in normals.iter() {
+            let rb   = RigidBody::new_static(Plane::new(*n), 0.3, 0.6);
+
+            world.add_rigid_body(rb);
+        }
+
+        /*
+        * Create the balls
+        */
+        let num     = 1500.0f32.powf(1.0f32 / 3.0) as usize;
+        let rad     = 0.5;
+        let shift   = 2.5 * rad;
+        let centerx = shift * (num as f32) / 2.0;
+        let centery = shift * (num as f32) / 2.0;
+
+        for i in 0usize .. num {
+            for j in 0usize .. num {
+                for k in 0usize .. num {
+                    let x = i as f32 * 2.5 * rad - centerx;
+                    let y = 10.0 + j as f32 * 2.5 * rad + centery * 2.0;
+                    let z = k as f32 * 2.5 * rad - centerx;
+
+                    let mut rb = RigidBody::new_dynamic(Ball::new(rad), 1.0, 0.3, 0.6);
+
+                    rb.append_translation(&Translation3::new(x, y, z));
+
+                    world.add_rigid_body(rb);
+                }
+            }
+        }
+
+        return world;
+    }
 }
 
 impl MainState {
