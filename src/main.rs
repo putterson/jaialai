@@ -14,6 +14,47 @@ impl MainState {
         let s = MainState { pos_x: 0.0, pos_y: 380.0 };
         Ok(s)
     }
+
+    fn draw_court(&mut self, ctx: &mut Context) -> GameResult<()> {
+        //Bottom
+        graphics::set_color(ctx, graphics::Color::new(0.1, 0.4, 0.2, 1.0))?;
+        graphics::polygon(ctx, DrawMode::Fill, & vec![
+            Point2::new(250.0,590.0),
+            Point2::new(50.0,490.0),
+            Point2::new(550.0,240.0),
+            Point2::new(750.0,340.0),
+        ])?;
+
+        //Side
+        graphics::set_color(ctx, graphics::Color::new(0.2, 0.3, 0.2, 1.0))?;
+        graphics::polygon(ctx, DrawMode::Fill, & vec![
+            Point2::new(50.0,490.0-COURT_HEIGHT),
+            Point2::new(50.0,490.0),
+            Point2::new(550.0,240.0),
+            Point2::new(550.0,240.0-COURT_HEIGHT),
+        ])?;
+
+        //Back
+
+        //baseboard
+        graphics::set_color(ctx, graphics::Color::new(1.0, 1.0, 1.0, 1.0))?;
+        graphics::polygon(ctx, DrawMode::Fill, & vec![
+            Point2::new(550.0,240.0-BASEBOARD_HEIGHT),
+            Point2::new(550.0,240.0),
+            Point2::new(750.0,340.0),
+            Point2::new(750.0,340.0-BASEBOARD_HEIGHT),
+        ])?;
+
+        graphics::set_color(ctx, graphics::Color::new(0.3, 0.35, 0.3, 1.0))?;
+        graphics::polygon(ctx, DrawMode::Fill, & vec![
+            Point2::new(550.0,240.0-BASEBOARD_HEIGHT),
+            Point2::new(550.0,240.0-COURT_HEIGHT),
+            Point2::new(750.0,340.0-COURT_HEIGHT),
+            Point2::new(750.0,340.0-BASEBOARD_HEIGHT),
+        ])?;
+
+        Ok(())
+    }
 }
 
 impl event::EventHandler for MainState {
@@ -24,22 +65,11 @@ impl event::EventHandler for MainState {
         Ok(())
     }
 
+
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
 
-        graphics::set_color(ctx, graphics::Color::new(0.1, 0.4, 0.2, 1.0))?;
-
-        graphics::polygon(ctx, DrawMode::Fill, & vec![
-            Point2::new(250.0,590.0),
-            Point2::new(50.0,490.0),
-            Point2::new(750.0,340.0),
-        ])?;
-
-        graphics::polygon(ctx, DrawMode::Fill, & vec![
-            Point2::new(550.0,240.0),
-            Point2::new(50.0,490.0),
-            Point2::new(750.0,340.0),
-        ])?;
+        self.draw_court(ctx)?;
 
         graphics::set_color(ctx, Color::new(1.0,1.0,1.0,0.8));
 
@@ -72,6 +102,9 @@ impl event::EventHandler for MainState {
         self.pos_x = self.pos_x + 10.00;
     }
 }
+
+const COURT_HEIGHT: f32 = 230.0;
+const BASEBOARD_HEIGHT: f32 = 20.0;
 
 pub fn main() {
     let c = conf::Conf::new();
