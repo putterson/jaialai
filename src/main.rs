@@ -7,8 +7,9 @@ extern crate nphysics3d;
 use ggez::*;
 use ggez::graphics::{DrawMode, Point2, Color};
 use ggez::event::{Mod, Keycode};
+use ggez::timer;
 
-use na::{Point3, Vector3, Translation3, Scalar, Real};
+use na::{Vector3, Translation3, Real};
 use ncollide::shape::{Ball, Plane};
 use nphysics3d::world::World;
 use nphysics3d::object::RigidBody;
@@ -16,16 +17,24 @@ use nphysics3d::object::RigidBody;
 
 struct MainState {
     pos_x: f32,
-    pos_y:f32
+    pos_y:f32,
+    physics: Physics,
 }
 
 
-struct Physics<N> where N: Real {
-    world: World<N>,
+struct Physics {
+    world: World<f32>,
 }
 
-impl<N: Real> Physics<N> {
-    pub fn init() -> World<N> {
+impl Physics {
+    fn new() -> Physics {
+        return Physics {
+            world: Physics::init(),
+        }
+    }
+
+
+    fn init() -> World<f32> {
         /*
         * World
         */
@@ -78,7 +87,7 @@ impl<N: Real> Physics<N> {
 
 impl MainState {
     fn new(_ctx: &mut Context) -> GameResult<MainState> {
-        let s = MainState { pos_x: 0.0, pos_y: 380.0 };
+        let s = MainState { pos_x: 0.0, pos_y: 380.0, physics: Physics::new() };
         Ok(s)
     }
 
@@ -126,7 +135,10 @@ impl MainState {
 
 impl event::EventHandler for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
-
+        let duration = timer::get_delta(_ctx);
+        let dt = duration.as_secs() as f32
+           + duration.subsec_nanos() as f32 * 1e-9;
+        self.physics.world.step(dt);
         self.pos_x = self.pos_x % 800.0 + 2.0;
         self.pos_y = self.pos_y % 600.0 + 1.0;
         Ok(())
